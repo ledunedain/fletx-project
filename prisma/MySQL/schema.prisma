@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql" // Cambia esto si usas MySQL, SQLite, etc.
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int    @id @default(autoincrement())
+  nombre    String
+  email     String @unique
+  password  String
+  companyId Int
+  company   Company @relation(fields: [companyId], references: [id])
+}
+
+model Company {
+  id             Int       @id @default(autoincrement())
+  nombre         String
+  direccion      String
+  ciudadId       Int
+  departamentoId Int
+  ciudad         City @relation(fields: [ciudadId], references: [id])
+  departamento   Department @relation(fields: [departamentoId], references: [id], name: "DepartmentToCompany")
+  usuarios       User[]
+  productos      Product[]
+}
+
+model Product {
+  id        Int    @id @default(autoincrement())
+  nombre    String
+  descripcion String
+  precio    Float
+  companyId Int
+  company   Company @relation(fields: [companyId], references: [id])
+}
+
+model City {
+  id           Int    @id @default(autoincrement())
+  nombre       String
+  departamentoId Int
+  departamento Department @relation(fields: [departamentoId], references: [id])
+  empresas     Company[]
+}
+
+model Department {
+  id        Int       @id @default(autoincrement())
+  nombre    String
+  ciudades  City[]
+  empresas  Company[] @relation("DepartmentToCompany")
+}

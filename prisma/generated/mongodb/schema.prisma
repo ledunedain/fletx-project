@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// 📌 Configuración para MongoDB
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGODB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/mongodb"
+}
+
+model UserInfo {
+  id               String @id @default(auto()) @map("_id") @db.ObjectId
+  userId           Int    @unique
+  imageUrl         String
+  telefono         String
+  direccion        String
+  username         String
+  cargo            String
+  salario          Float
+  impuestosAnuales Float
+}
+
+model CompanyInfo {
+  id                 String @id @default(auto()) @map("_id") @db.ObjectId
+  companyId          Int    @unique
+  logoUrl            String
+  telefono           String
+  direccion          String
+  actividadEconomica String
+  codigoActividad    String
+}
+
+model ProductInfo {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  productId    Int     @unique
+  imageUrl     String
+  cantidad     Int
+  categoria    String
+  subCategoria String?
+}
