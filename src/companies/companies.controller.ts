@@ -1,15 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { S3Service } from 'src/services/s3.service';
 
 @Controller('companies')
 export class CompaniesController {
-  constructor(private readonly companiesService: CompaniesService) {}
+  constructor(
+    private readonly companiesService: CompaniesService,
+    private readonly s3Service: S3Service
+  ) {}
 
   @Post()
-  create(@Body() createCompanyDto: CreateCompanyDto) {
-    return this.companiesService.create(createCompanyDto);
+  @UseInterceptors(FileInterceptor('logoUrl'))
+  async createCompany(
+    @Body() companyData: CreateCompanyDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const imageUrl = file ? await this.s3Service.uploadFile(file, 'companies') : null;
+    companyData.logoUrl = imageUrl ? imageUrl:'no logo';
+
+    return await this.companiesService.create(companyData);
   }
 
   @Get()

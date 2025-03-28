@@ -1,26 +1,56 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { PrismaService } from '../database/prisma.service';
+import { Company } from './entities/company.entity';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class CompaniesService {
-  create(createCompanyDto: CreateCompanyDto) {
-    return 'This action adds a new company';
+  constructor(
+    private readonly prisma: PrismaService
+  ) { }
+
+  async create(data: CreateCompanyDto) {
+    return await this.prisma.company.create({
+      data: {
+        nombre: data.nombre,
+        direccion: data.direccion,
+        ciudadId: Number(data.ciudadId),
+        status: true
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all companies`;
+  async findAll() {
+    return await this.prisma.company.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} company`;
+  async findOne(id: number) {
+    return await this.prisma.company.findUnique({
+      where: { id },
+      include: { ciudad: true },
+    });
   }
 
-  update(id: number, updateCompanyDto: UpdateCompanyDto) {
-    return `This action updates a #${id} company`;
+  async update(id: number, data: UpdateCompanyDto) {
+    return await this.prisma.company.update({
+      where: { id },
+      data: {
+        nombre: data.nombre,
+        direccion: data.direccion,
+        ciudadId: Number(data.ciudadId),
+      },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} company`;
+  async remove(id: number) {
+    return await this.prisma.company.update({
+      where: { id },
+      data:{
+        status:false
+      }
+    });
   }
 }

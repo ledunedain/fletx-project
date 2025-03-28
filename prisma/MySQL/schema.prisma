@@ -18,6 +18,7 @@ model User {
   nombre    String
   email     String @unique
   password  String
+  status    Boolean
   companyId Int
   company   Company @relation(fields: [companyId], references: [id])
 }
@@ -27,11 +28,10 @@ model Company {
   nombre         String
   direccion      String
   ciudadId       Int
-  departamentoId Int
   ciudad         City @relation(fields: [ciudadId], references: [id])
-  departamento   Department @relation(fields: [departamentoId], references: [id], name: "DepartmentToCompany")
   usuarios       User[]
   productos      Product[]
+  status         Boolean
 }
 
 model Product {
@@ -39,13 +39,14 @@ model Product {
   nombre    String
   descripcion String
   precio    Float
+  status    Boolean
   companyId Int
   company   Company @relation(fields: [companyId], references: [id])
 }
 
 model City {
   id           Int    @id @default(autoincrement())
-  nombre       String
+  nombre       String   @unique
   departamentoId Int
   departamento Department @relation(fields: [departamentoId], references: [id])
   empresas     Company[]
@@ -53,7 +54,6 @@ model City {
 
 model Department {
   id        Int       @id @default(autoincrement())
-  nombre    String
+  nombre    String    @unique
   ciudades  City[]
-  empresas  Company[] @relation("DepartmentToCompany")
 }
